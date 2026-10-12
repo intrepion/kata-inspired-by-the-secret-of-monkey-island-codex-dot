@@ -15,3 +15,9 @@ Reviewer: spec_review. One partial requirement: specification promises “Termin
 Resolution: post-ending Look now provides scene observations without changing state. Added a regression test that failed before the fix and passes after it. Browser QA confirmed inspection and stable terminal acquisition attempts. A second observed UX issue—hints suggesting recovery of a lens already held—received a failing regression and state-aware correction.
 
 Initial findings: Standards 0 hard / 2 heuristic; Spec 1 partial. All addressed. Follow-up independent verification is recorded below after the final code review.
+
+## Follow-up verification
+
+On `1f21539...8de961e`, the Spec reviewer independently ran **16/16 tests plus typecheck**, found no remaining substantive specification issue, and confirmed the terminal inspection, state-aware hints, mobile controls and descriptive updates. The Standards reviewer found no substantive violation or regression; suggested making milestone query arguments and requirements keys typed as well. That small refinement was applied: `has` accepts Milestone and `requirements` uses Partial<Record<Milestone, Milestone[]>>, with untrusted flags validated before casting. Runtime behavior is unchanged and final tests/typecheck pass.
+
+Final findings: Standards **0 hard / 0 unresolved heuristic**; Spec **0 unresolved**. Browser completion, final SHA and CI were verified by the primary implementer and are not attributed to these read-only reviewers.

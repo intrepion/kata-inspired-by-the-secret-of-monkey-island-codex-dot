@@ -6,7 +6,7 @@ export type Milestone = typeof milestones[number];
 export type State = {version:1;location:Location;flags:Milestone[]};
 export const milestones = ['ribbonTaken','cupTaken','corkTaken','crankTaken','clothMade','buoyMade','lensRecovered','scoopMade','beaconFixed','signalSent','heardToast','heardMending','heardWeather','benefitAccepted','contributionAccepted','responsibilityAccepted','permitGranted','soapTaken','latchFreed','bellTaken','won'] as const;
 export const newGame = ():State => ({version:1,location:'wharf',flags:[]});
-export const has = (s:State,f:string) => s.flags.some(flag=>flag===f);
+export const has = (s:State,f:Milestone) => s.flags.some(flag=>flag===f);
 export const itemNames = {ribbon:'Ceremony ribbon',cup:'Brass cup',cork:'Giant cork',cloth:'Sailcloth',crank:'Hand crank',buoy:'Corked cup',lens:'Lamp lens',scoop:'Wind scoop',soap:'Dock soap',bell:'Laughing Bell',permit:'Fort permit'} as const;
 export type Item = keyof typeof itemNames;
 const ownership:Record<Item,[Milestone,Milestone?]> = {ribbon:['ribbonTaken','clothMade'],cup:['cupTaken','buoyMade'],cork:['corkTaken','buoyMade'],cloth:['clothMade','scoopMade'],crank:['crankTaken','scoopMade'],buoy:['buoyMade','lensRecovered'],lens:['lensRecovered','signalSent'],scoop:['scoopMade','beaconFixed'],soap:['soapTaken','latchFreed'],bell:['bellTaken','won'],permit:['permitGranted']};
@@ -114,7 +114,7 @@ export function transition(s:State,a:Action):{state:State;message:string}{
  }
  return result('Nothing changes.');
 }
-export const requirements:Record<string,Milestone[]>={clothMade:['ribbonTaken'],buoyMade:['cupTaken','corkTaken'],lensRecovered:['buoyMade'],scoopMade:['clothMade','crankTaken'],beaconFixed:['scoopMade'],signalSent:['beaconFixed','lensRecovered'],benefitAccepted:['heardToast'],contributionAccepted:['benefitAccepted','heardMending'],responsibilityAccepted:['contributionAccepted','heardWeather'],permitGranted:['responsibilityAccepted'],latchFreed:['soapTaken','permitGranted','signalSent'],bellTaken:['latchFreed'],won:['bellTaken']};
+export const requirements:Partial<Record<Milestone,Milestone[]>>={clothMade:['ribbonTaken'],buoyMade:['cupTaken','corkTaken'],lensRecovered:['buoyMade'],scoopMade:['clothMade','crankTaken'],beaconFixed:['scoopMade'],signalSent:['beaconFixed','lensRecovered'],benefitAccepted:['heardToast'],contributionAccepted:['benefitAccepted','heardMending'],responsibilityAccepted:['contributionAccepted','heardWeather'],permitGranted:['responsibilityAccepted'],latchFreed:['soapTaken','permitGranted','signalSent'],bellTaken:['latchFreed'],won:['bellTaken']};
 export function encodeSave(s:State):string{return JSON.stringify(s);}
 export function decodeSave(raw:string):State|null{
  try{
@@ -125,12 +125,13 @@ export function decodeSave(raw:string):State|null{
   if(Object.keys(v).sort().join(',')!=='flags,location,version'||v.version!==1||typeof v.location!=='string'||!locations.includes(v.location as Location)||!Array.isArray(v.flags))return null;
   const flags=v.flags;
   if(flags.length>milestones.length||flags.some(f=>typeof f!=='string'||!milestones.includes(f as typeof milestones[number]))||new Set(flags).size!==flags.length)return null;
-  if(flags.some(f=>(requirements[f]||[]).some(r=>!flags.includes(r))))return null;
+  const checked=flags as Milestone[];
+  if(checked.some(f=>(requirements[f]||[]).some(r=>!checked.includes(r))))return null;
   // The final appeal grants both milestones atomically.
   if(flags.includes('responsibilityAccepted')!==flags.includes('permitGranted'))return null;
   if(v.location==='fort'&&(!flags.includes('permitGranted')||!flags.includes('signalSent')))return null;
   if(flags.includes('won')&&v.location!=='wharf')return null;
-  return {version:1,location:v.location as Location,flags:[...flags]};
+  return {version:1,location:v.location as Location,flags:[...checked]};
  }catch{return null;}
 }
 export function objective(s:State):{title:string;steps:string[]}{
