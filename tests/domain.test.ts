@@ -12,7 +12,7 @@ test('a corked cup combines in both orders, and the ingredients leave the bag', 
  s = transition(s,{type:'interact',verb:'take',target:'cup'}).state;
  s = transition(s,{type:'move',location:'market'}).state;
  s = transition(s,{type:'interact',verb:'take',target:'cork'}).state;
- for(const [a,b] of [['cup','cork'],['cork','cup']]) assert.deepEqual(inventory(transition(s,{type:'combine',a,b}).state), ['buoy']);
+ for(const [a,b] of [['cup','cork'],['cork','cup']] as const) assert.deepEqual(inventory(transition(s,{type:'combine',a,b}).state), ['buoy']);
 });
 import { decodeSave, encodeSave, hint } from '../src/domain.ts';
 test('save round trips and rejects an impossible premature lens consumption',()=>{

@@ -1,14 +1,16 @@
 export const locations = ['wharf','tavern','market','weather','customs','fort'] as const;
 export type Location = typeof locations[number];
 export type Verb = 'look'|'talk'|'take'|'use';
-export type Action = {type:'interact';verb:Verb;target:string;item?:string}|{type:'move';location:Location}|{type:'combine';a:string;b:string}|{type:'say';topic:string};
-export type State = {version:1;location:Location;flags:string[]};
-export const milestones = ['ribbonTaken','cupTaken','corkTaken','crankTaken','clothMade','buoyMade','lensRecovered','scoopMade','beaconFixed','signalSent','heardToast','heardMending','heardWeather','duel1','duel2','duel3','permitGranted','soapTaken','latchFreed','bellTaken','won'] as const;
+export type Action = {type:'interact';verb:Verb;target:string;item?:Item}|{type:'move';location:Location}|{type:'combine';a:Item;b:Item}|{type:'say';topic:string};
+export type Milestone = typeof milestones[number];
+export type State = {version:1;location:Location;flags:Milestone[]};
+export const milestones = ['ribbonTaken','cupTaken','corkTaken','crankTaken','clothMade','buoyMade','lensRecovered','scoopMade','beaconFixed','signalSent','heardToast','heardMending','heardWeather','benefitAccepted','contributionAccepted','responsibilityAccepted','permitGranted','soapTaken','latchFreed','bellTaken','won'] as const;
 export const newGame = ():State => ({version:1,location:'wharf',flags:[]});
-export const has = (s:State,f:string) => s.flags.includes(f);
-export const itemNames:Record<string,string> = {ribbon:'Ceremony ribbon',cup:'Brass cup',cork:'Giant cork',cloth:'Sailcloth',crank:'Hand crank',buoy:'Corked cup',lens:'Lamp lens',scoop:'Wind scoop',soap:'Dock soap',bell:'Laughing Bell',permit:'Fort permit'};
-const ownership:Record<string,[string,string?]> = {ribbon:['ribbonTaken','clothMade'],cup:['cupTaken','buoyMade'],cork:['corkTaken','buoyMade'],cloth:['clothMade','scoopMade'],crank:['crankTaken','scoopMade'],buoy:['buoyMade','lensRecovered'],lens:['lensRecovered','signalSent'],scoop:['scoopMade','beaconFixed'],soap:['soapTaken','latchFreed'],bell:['bellTaken','won'],permit:['permitGranted']};
-export function inventory(s:State):string[]{return Object.entries(ownership).filter(([, [got,used]])=>has(s,got)&&(!used||!has(s,used))).map(([item])=>item);}
+export const has = (s:State,f:string) => s.flags.some(flag=>flag===f);
+export const itemNames = {ribbon:'Ceremony ribbon',cup:'Brass cup',cork:'Giant cork',cloth:'Sailcloth',crank:'Hand crank',buoy:'Corked cup',lens:'Lamp lens',scoop:'Wind scoop',soap:'Dock soap',bell:'Laughing Bell',permit:'Fort permit'} as const;
+export type Item = keyof typeof itemNames;
+const ownership:Record<Item,[Milestone,Milestone?]> = {ribbon:['ribbonTaken','clothMade'],cup:['cupTaken','buoyMade'],cork:['corkTaken','buoyMade'],cloth:['clothMade','scoopMade'],crank:['crankTaken','scoopMade'],buoy:['buoyMade','lensRecovered'],lens:['lensRecovered','signalSent'],scoop:['scoopMade','beaconFixed'],soap:['soapTaken','latchFreed'],bell:['bellTaken','won'],permit:['permitGranted']};
+export function inventory(s:State):Item[]{return (Object.entries(ownership) as [Item,[Milestone,Milestone?]][]).filter(([, [got,used]])=>has(s,got)&&(!used||!has(s,used))).map(([item])=>item);}
 const targets:Record<Location,string[]> = {wharf:['ribbon','pool','mooring','juniper'],tavern:['cup','barkeep','toast'],market:['cork','tailor','notice'],weather:['crank','keeper','vane','beacon'],customs:['clerk','gate','rules'],fort:['latch','bell','clasp']};
 const descriptions:Record<string,string> = {
  ribbon:'A crimson ceremony ribbon. The tailor at Button Market could probably give this orphaned flourish a home.',
@@ -34,7 +36,8 @@ const descriptions:Record<string,string> = {
 };
 export function transition(s:State,a:Action):{state:State;message:string}{
  const result=(message:string,state=s)=>({state,message});
- const grant=(flags:string[],message:string)=>result(message,{...s,flags:[...s.flags,...flags.filter(f=>!has(s,f))].sort()});
+ const grant=(flags:Milestone[],message:string)=>result(message,{...s,flags:[...s.flags,...flags.filter(f=>!has(s,f))].sort()});
+ if(has(s,'won')&&a.type==='interact'&&a.verb==='look'&&targets[s.location].includes(a.target))return result(a.target==='mooring'?'The Laughing Bell hangs proudly on its stand. The lagoon has found its voice again.':descriptions[a.target]);
  if(has(s,'won')) return result('The bell is home. The lagoon is laughing. Your work here is done—explore your journal or begin another evening.');
  if(a.type==='move') {
   if(!locations.includes(a.location)) return result('That destination is not on this chart.');
@@ -52,6 +55,7 @@ export function transition(s:State,a:Action):{state:State;message:string}{
   const topic=a.topic;
   if(s.location==='tavern'){
    if(topic==='toast')return grant(['heardToast'],'Pella: “A toast means everybody gets a seat. Even Ada. Especially Ada. She keeps standing outside with a clipboard.”');
+   if(topic==='paste'&&has(s,'soapTaken'))return result(has(s,'latchFreed')?'Pella: “You put the soap to good use. The paperwork thanks you.”':'Pella: “You already have the dock soap. One bar is plenty for one scandal.”');
    if(topic==='paste')return grant(['soapTaken'],'Pella: “Stamp paste? Dock soap softens it. Take this bar. The paperwork will smell better than its author.”');
    if(topic==='pella')return result('Pella: “I retired after discovering that a tavern can have a plank without making anybody walk it.”');
   }
@@ -68,17 +72,17 @@ export function transition(s:State,a:Action):{state:State;message:string}{
    if(topic==='ada')return result('Ada: “I once filed an invitation under Unscheduled Happiness. Nobody corrected me. Nobody came.”');
    if(topic==='everyone'){
     if(!has(s,'heardToast'))return result('Ada: “Whose seat? Ask Pella what a toast really means, then return.”');
-    return grant(['duel1'],'Ada: “Everybody gets a seat? Including clerks? I shall note that in ink rather than pencil.”');
+    return grant(['benefitAccepted'],'Ada: “Everybody gets a seat? Including clerks? I shall note that in ink rather than pencil.”');
    }
    if(topic==='repairAnswer'){
-    if(!has(s,'duel1'))return result('Ada: “First tell me who benefits.”');
+    if(!has(s,'benefitAccepted'))return result('Ada: “First tell me who benefits.”');
     if(!has(s,'heardMending'))return result('Ada: “A useful promise needs an example. Ask Miri about repairs.”');
-    return grant(['duel2'],'Ada: “You will mend what we share. That is a contribution with fewer syllables than ‘synergy’. Accepted.”');
+    return grant(['contributionAccepted'],'Ada: “You will mend what we share. That is a contribution with fewer syllables than ‘synergy’. Accepted.”');
    }
    if(topic==='together'){
-    if(!has(s,'duel2'))return result('Ada: “We still need to settle your contribution.”');
+    if(!has(s,'contributionAccepted'))return result('Ada: “We still need to settle your contribution.”');
     if(!has(s,'heardWeather'))return result('Ada: “Ask Orrin who carries a storm. Then we can talk responsibility.”');
-    return grant(['duel3','permitGranted'],'Ada: “We carry it together. Permit granted. And... could you save a seat for me?”');
+    return grant(['responsibilityAccepted','permitGranted'],'Ada: “We carry it together. Permit granted. And... could you save a seat for me?”');
    }
    if(topic==='brag')return result('Ada: “Your hat is not a public benefit. No progress is lost. Try an answer about the lagoon.”');
   }
@@ -88,7 +92,7 @@ export function transition(s:State,a:Action):{state:State;message:string}{
  if(a.verb==='look')return result(descriptions[a.target]||'A fine specimen of something unhelpful.');
  if(a.verb==='talk')return result(['barkeep','tailor','keeper','clerk'].includes(a.target)?'Choose a conversation topic below. You can always come back.':'It listens politely. It remains an object.');
  if(a.verb==='take'){
-  const acquisitions:Record<string,[string,string]>={ribbon:['ribbonTaken','You rescue the ceremony ribbon. It is delighted to have a plot.'],cup:['cupTaken','Pella waves you toward the leaky brass cup. “On the house. Not under it, it leaks.”'],cork:['corkTaken','You pocket the giant cork. Every hole deserves a second chance.'],crank:['crankTaken','Orrin lets you take the spare crank. “Please put a useful spin on it.”']};
+  const acquisitions:Record<string,[Milestone,string]>={ribbon:['ribbonTaken','You rescue the ceremony ribbon. It is delighted to have a plot.'],cup:['cupTaken','Pella waves you toward the leaky brass cup. “On the house. Not under it, it leaks.”'],cork:['corkTaken','You pocket the giant cork. Every hole deserves a second chance.'],crank:['crankTaken','Orrin lets you take the spare crank. “Please put a useful spin on it.”']};
   if(acquisitions[a.target]){const[f,message]=acquisitions[a.target];return has(s,f)?result('You already collected that. There are no spare plot devices.'):grant([f],message);}
   if(a.target==='bell'){
    if(!has(s,'latchFreed'))return result('The latch is sealed with stamp paste. Something soapy would soften it.');
@@ -110,7 +114,7 @@ export function transition(s:State,a:Action):{state:State;message:string}{
  }
  return result('Nothing changes.');
 }
-export const requirements:Record<string,string[]>={clothMade:['ribbonTaken'],buoyMade:['cupTaken','corkTaken'],lensRecovered:['buoyMade'],scoopMade:['clothMade','crankTaken'],beaconFixed:['scoopMade'],signalSent:['beaconFixed','lensRecovered'],duel1:['heardToast'],duel2:['duel1','heardMending'],duel3:['duel2','heardWeather'],permitGranted:['duel3'],latchFreed:['soapTaken','permitGranted','signalSent'],bellTaken:['latchFreed'],won:['bellTaken']};
+export const requirements:Record<string,Milestone[]>={clothMade:['ribbonTaken'],buoyMade:['cupTaken','corkTaken'],lensRecovered:['buoyMade'],scoopMade:['clothMade','crankTaken'],beaconFixed:['scoopMade'],signalSent:['beaconFixed','lensRecovered'],benefitAccepted:['heardToast'],contributionAccepted:['benefitAccepted','heardMending'],responsibilityAccepted:['contributionAccepted','heardWeather'],permitGranted:['responsibilityAccepted'],latchFreed:['soapTaken','permitGranted','signalSent'],bellTaken:['latchFreed'],won:['bellTaken']};
 export function encodeSave(s:State):string{return JSON.stringify(s);}
 export function decodeSave(raw:string):State|null{
  try{
@@ -123,7 +127,7 @@ export function decodeSave(raw:string):State|null{
   if(flags.length>milestones.length||flags.some(f=>typeof f!=='string'||!milestones.includes(f as typeof milestones[number]))||new Set(flags).size!==flags.length)return null;
   if(flags.some(f=>(requirements[f]||[]).some(r=>!flags.includes(r))))return null;
   // The final appeal grants both milestones atomically.
-  if(flags.includes('duel3')!==flags.includes('permitGranted'))return null;
+  if(flags.includes('responsibilityAccepted')!==flags.includes('permitGranted'))return null;
   if(v.location==='fort'&&(!flags.includes('permitGranted')||!flags.includes('signalSent')))return null;
   if(flags.includes('won')&&v.location!=='wharf')return null;
   return {version:1,location:v.location as Location,flags:[...flags]};
@@ -133,6 +137,7 @@ export function objective(s:State):{title:string;steps:string[]}{
  if(has(s,'won'))return {title:'A seat for everyone',steps:['The bell is home. Enjoy the evening.','Read your field notes or start another voyage.','Restart begins a fresh story; your manual save stays until replaced.']};
  if(!has(s,'signalSent')){
   if(!has(s,'beaconFixed'))return {title:'Turn the Weather House beacon',steps:['Orrin needs something to catch a breeze. Talk to the tailor and look around.','Miri trades sailcloth for a ribbon. Cloth on a crank makes a wind scoop.','Take the wharf ribbon; use it on Miri. Take the Weather House crank. Combine sailcloth + crank, then use wind scoop on the weather vane.']};
+  if(has(s,'lensRecovered'))return {title:'Light the beacon',steps:['The lens is already in your bag. The repaired beacon is ready for it.','The beacon lens housing is waiting at the Weather House.','Select the lamp lens in your satchel, then use it on the beacon lens housing.']};
   return {title:'Recover the missing lamp lens',steps:['A little floating vessel could reach the tide pool treasure.','The leaky tavern cup needs a plug. The market has a giant cork.','Take brass cup and cork; combine them. Use corked cup on the wharf tide pool. Use lamp lens on the repaired beacon.']};
  }
  if(!has(s,'permitGranted'))return {title:'Make a civic appeal',steps:['Ada asks about benefit, contribution and risk. Local people have thoughts on all three.','Talk to Pella about the toast, Miri about repairs, and Orrin about storms.','Talk to Ada: Everybody gets a seat; I will mend what we share; We carry the risk together. Questions follow that order.']};

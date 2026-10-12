@@ -1,9 +1,9 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {newGame,transition,inventory,has,decodeSave,encodeSave,hint,type State,type Action,type Location} from '../src/domain.ts';
+import {newGame,transition,inventory,has,decodeSave,encodeSave,hint,type State,type Action,type Location,type Item} from '../src/domain.ts';
 function at(s:State,location:Location,action:Action):State{return transition(transition(s,{type:'move',location}).state,action).state;}
 const take=(target:string):Action=>({type:'interact',verb:'take',target});
-const use=(item:string,target:string):Action=>({type:'interact',verb:'use',item,target});
+const use=(item:Item,target:string):Action=>({type:'interact',verb:'use',item,target});
 const say=(topic:string):Action=>({type:'say',topic});
 // Independently specified legal plan candidates, not imported from domain rule tables.
 const steps:[Location,Action][]=[['wharf',take('ribbon')],['tavern',take('cup')],['market',take('cork')],['weather',take('crank')],['market',use('ribbon','tailor')],['wharf',{type:'combine',a:'cup',b:'cork'}],['wharf',use('buoy','pool')],['weather',{type:'combine',a:'cloth',b:'crank'}],['weather',use('scoop','vane')],['weather',use('lens','beacon')],['tavern',say('toast')],['market',say('repair')],['weather',say('storm')],['customs',say('everyone')],['customs',say('repairAnswer')],['customs',say('together')],['tavern',say('paste')],['fort',use('soap','latch')],['fort',take('bell')],['wharf',use('bell','mooring')]];
@@ -50,7 +50,7 @@ test('terminal actions are stable and a fresh voyage has no inherited progress',
  assert.deepEqual(newGame(),{version:1,location:'wharf',flags:[]});
 });
 test('untrusted saves reject corruption, unknowns, duplicate flags, bad locations and atomic inconsistencies',()=>{
- for(const raw of ['null','[]','{',JSON.stringify({version:2,location:'wharf',flags:[]}),JSON.stringify({version:1,location:'fort',flags:[]}),JSON.stringify({version:1,location:'wharf',flags:['ribbonTaken','ribbonTaken']}),JSON.stringify({version:1,location:'wharf',flags:['alien']}),JSON.stringify({version:1,location:'wharf',flags:['duel3']}),JSON.stringify({...newGame(),inventory:['bell']}),JSON.stringify({...run(),location:'market'})])assert.equal(decodeSave(raw),null);
+ for(const raw of ['null','[]','{',JSON.stringify({version:2,location:'wharf',flags:[]}),JSON.stringify({version:1,location:'fort',flags:[]}),JSON.stringify({version:1,location:'wharf',flags:['ribbonTaken','ribbonTaken']}),JSON.stringify({version:1,location:'wharf',flags:['alien']}),JSON.stringify({version:1,location:'wharf',flags:['responsibilityAccepted']}),JSON.stringify({...newGame(),inventory:['bell']}),JSON.stringify({...run(),location:'market'})])assert.equal(decodeSave(raw),null);
 });
 test('EVERY reachable progression state is valid and has a route to completion',()=>{
  // Collapse freely reversible travel; each candidate still moves through the public gate.
@@ -69,4 +69,13 @@ test('EVERY reachable progression state is valid and has a route to completion',
  for(const i of all.map((_,i)=>i).sort((a,b)=>all[b].flags.length-all[a].flags.length))if(has(all[i],'won')||edges[i].some(j=>canFinish.has(j)))canFinish.add(i);
  assert.equal(canFinish.size,all.length,'Every reachable milestone set must reach the ending');
  console.log(`Exhaustive proof: ${all.length} reachable progression states; ${edges.reduce((n,e)=>n+e.length,0)} successful transitions; all can finish. Travel equivalence is valid because all unlocked scenes are bidirectionally connected.`);
+});
+
+test('completed voyages can still inspect the wharf without changing progress',()=>{
+ const finished=run();
+ const r=transition(finished,{type:'interact',verb:'look',target:'juniper'});
+ assert.match(r.message,/courier/);assert.deepEqual(r.state,finished);
+});
+test('hints recognize a lens already recovered before the vane repair',()=>{
+ const s=run(steps.slice(0,9));assert.match(hint(s,0),/lens.*bag/i);
 });
