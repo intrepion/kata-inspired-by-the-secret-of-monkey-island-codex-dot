@@ -2,3 +2,5 @@
 
 @media(max-width:780px){.accessible-targets button{font-size:12px;min-height:44px;padding:10px}.header-actions button{min-height:44px}.verbs button{min-height:44px}.item{min-height:48px;font-size:12px}.scene-footer button{font-size:11px;min-height:40px}.hint-buttons button{min-height:44px}.conversation button{min-height:44px}}
 @media(max-width:420px){.hotspot{font-size:10px;padding:6px}.hot-label{max-width:125px;overflow:hidden;text-overflow:ellipsis}}
+
+.sword-trial svg{width:100%;height:115px}.duel-replies{display:grid;gap:10px;margin:20px 0}.duel-replies button{text-align:left;white-space:normal}.sword-trial blockquote{margin:18px 0;padding:16px;border-left:4px solid #b78b50;background:#b78b5014;font-size:1.2rem}.sword-trial details{margin:18px 0}

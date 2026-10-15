@@ -1,0 +1,15 @@
+# Learned-retort sword-banter slice
+
+> Final native acceptance completed on 2026-10-15. See [the normal-input record](LOCAL_ACCEPTANCE_2026-10-15.md) for observed outcomes and remaining limits. Earlier worker statements below describe source-only handoff evidence.
+
+Research read 2026-10-15: [Lucasfilm’s official retrospective](https://www.lucasfilm.com/news/lucasfilm-games-rewind-the-secret-of-monkey-island/) identifies collecting responses as the swordplay advantage. [Ron Gilbert/Tim Schafer interview](https://www.gamesradar.com/making-of-monkey-island-insult-sword-fighting/) explains replacing twitch swordplay with logic; its accompanying account describes new Swordmaster insults requiring learned retorts. All dialogue, fencers and fiction here are original.
+
+Recommended bounded design: optional trial, separate storage. Practice losses teach missing replies; first to two ends the bout while knowledge remains. Once all three are known, instructor first-to-three uses new prompts. Input cannot use an unlearned reply, score twice in one exchange or advance after an outcome. No reflex timer or injected knowledge. Only learned IDs and instructor-victory persist, validated on load; in-progress bouts reset safely.
+
+`src/duel.ts` is the pure state seam; `src/main.ts` supplies dialog controls and a separate save key. Pella’s conversation offers entry. Existing `src/domain.ts` and its story save format are untouched. 19/19 staged tests passed, including the unchanged exhaustive 1473-state/6180-edge proof that every reachable story progression can finish. Actual strict typecheck, all 19 tests including that solver, and production build passed. Existing preview PID30848 on5208 now serves the updated dist. All independent reviews and focused native acceptance completed; see central evidence below.
+
+Normal-input route: Begin adventure → Sword-banter trial (or Talk/Pella/practice) → Spar → admit no answer, Next twice (lose but learn two) → Spar again, answer known lines and learn the third → Challenge instructor → match new semantic prompts to learned replies three times → victory → Return → Save story → reload → reopen trial and verify learned notebook and story inventory remain. Wrong known replies should lose safely; Escape can leave any exchange.
+
+Limits: three response families, fixed practice sequence, no player-initiated insult attack phase, static original fencing illustration; story remains point-and-click scene changes without avatar walking. No preview restart, commits or pushes by this worker.
+
+Native acceptance (2026-10-15): Practice loss retains notebook; practice2–1 learns all 3; instructor new prompts 3–0; ribbon/story and notebook/victory reload. Camera: Fixed illustrated scenes and two-fencer duel. Controls: Click/Tab + Enter response and exchange;1–4 verbs/Escape. Central evidence: [native acceptance](LOCAL_ACCEPTANCE_2026-10-15.md) (screenshots alongside). Limit: Three response families, response-only duel/static fencers; original full story route is solver evidence. Existing localhost/127-origin saves were untouched; test progress was isolated at `http://fidelity-qa-20261015.localhost:5208/`.
