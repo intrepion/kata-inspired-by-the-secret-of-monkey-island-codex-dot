@@ -45,3 +45,7 @@ See [specification](docs/specification.md), [glossary](GLOSSARY.md), [architectu
 Choose **Sword-banter trial** in the header, or talk to Captain Pella about practicing. Lose practice exchanges to learn three original retorts, then use them to win. The instructor uses **new insults** that require those same replies by meaning. Select a response, read the exchange, then choose Next; there is no timing test. A practice bout is first to two, instructor first to three. Learned lines survive losses and reload.
 
 The optional trial uses its own `last-laugh-banter-v1` key and never writes the existing story save. Return to the adventure or press Escape at any time. Reload preserves knowledge/victory and starts outside a bout. Story puzzles, items and endings are unchanged. This adds a bounded dialogue-dueling mechanic; avatar walking and the full commercial adventure are not recreated. [Research, checks and acceptance](docs/fidelity-duel.md).
+
+## Play online
+
+[Play the hosted game](https://intrepion.github.io/kata-inspired-by-the-secret-of-monkey-island-codex-dot/)
