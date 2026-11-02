@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "workflowCommit": "97756e55ad2f1256c1679b0451c0f7bbd73dcf75",
+  "sourceCommit": "57552d3826f218bc94ddf3cf5ee5ec67c05ec0a7",
+  "runId": "41425207526",
+  "url": "http://127.0.0.1:4262/",
+  "inputs": {
+    "index.html": "ff3269beff29d17ea785473f9492ca0c43eec5654be809a660496faa3d560f7e",
+    "favicon.svg": "2af90c589e830a90d45efa6511069812e19d00953b0c35ff0732246b539551c4",
+    "assets/index-CYdPXU5T.js": "ebbce5b26ffcbbb31b9e6855509d4479ea7953f60e9799665fe1ebdb1fac97dc",
+    "assets/index-DkfREttA.css": "9541b818f347825794270df53950334e73acad509b9ab63e9735acc9b6f81b22"
+  },
+  "browser": "153.0.8010.12",
+  "viewport": {
+    "width": 1280,
+    "height": 1000
+  },
+  "screenshots": [
+    "lagoon-01.png",
+    "lagoon-02.png"
+  ]
+}

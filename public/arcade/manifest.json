@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "gameId": "kata-inspired-by-the-secret-of-monkey-island-codex-dot",
   "playUrl": "https://intrepion.github.io/kata-inspired-by-the-secret-of-monkey-island-codex-dot/",
   "screenshots": [
@@ -23,6 +23,48 @@
         "sourcePath": "docs/qa/market.jpg",
         "deployedBuild": null,
         "captureDate": null
+      }
+    },
+    {
+      "path": "arcade/screenshots/ci-20261102-01.jpg",
+      "sha256": "2061d8040c60d8f34832578dd6df13bdd257a1252d2a6cb4785ad36d972b76ae",
+      "alt": "The Last Laugh Lagoon gameplay, view 1",
+      "provenance": {
+        "kind": "ci_gameplay_capture",
+        "sourcePath": "arcade/capture-evidence/ci-20261102-01.png",
+        "sourceSha256": "b40860d773cbf4295c6d30180a287319bfaec506d20a05b6ae9f3dd46b90992a",
+        "captureCommit": "57552d3826f218bc94ddf3cf5ee5ec67c05ec0a7",
+        "workflowRunId": "41425207526",
+        "inputHashes": {
+          "index.html": "ff3269beff29d17ea785473f9492ca0c43eec5654be809a660496faa3d560f7e",
+          "favicon.svg": "2af90c589e830a90d45efa6511069812e19d00953b0c35ff0732246b539551c4",
+          "assets/index-CYdPXU5T.js": "ebbce5b26ffcbbb31b9e6855509d4479ea7953f60e9799665fe1ebdb1fac97dc",
+          "assets/index-DkfREttA.css": "9541b818f347825794270df53950334e73acad509b9ab63e9735acc9b6f81b22"
+        },
+        "publishedFilesVerifiedAt": "2026-11-02T19:01:20Z",
+        "captureRecordPath": "arcade/capture-evidence/ci-20261102-record.json",
+        "captureRecordSha256": "82c12b4394ea2b5a1a668f6d5c31a64e52febdb8572859b5450cc850bfb82865"
+      }
+    },
+    {
+      "path": "arcade/screenshots/ci-20261102-02.jpg",
+      "sha256": "b2b71525597aae48c746fa06fae6039a6a272126eb1f0072f3798dff2570cbbf",
+      "alt": "The Last Laugh Lagoon gameplay, view 2",
+      "provenance": {
+        "kind": "ci_gameplay_capture",
+        "sourcePath": "arcade/capture-evidence/ci-20261102-02.png",
+        "sourceSha256": "348730e1bd40747249ad64972769ece01100c8a69bf0e0e9fdc7c5d810d29947",
+        "captureCommit": "57552d3826f218bc94ddf3cf5ee5ec67c05ec0a7",
+        "workflowRunId": "41425207526",
+        "inputHashes": {
+          "index.html": "ff3269beff29d17ea785473f9492ca0c43eec5654be809a660496faa3d560f7e",
+          "favicon.svg": "2af90c589e830a90d45efa6511069812e19d00953b0c35ff0732246b539551c4",
+          "assets/index-CYdPXU5T.js": "ebbce5b26ffcbbb31b9e6855509d4479ea7953f60e9799665fe1ebdb1fac97dc",
+          "assets/index-DkfREttA.css": "9541b818f347825794270df53950334e73acad509b9ab63e9735acc9b6f81b22"
+        },
+        "publishedFilesVerifiedAt": "2026-11-02T19:01:20Z",
+        "captureRecordPath": "arcade/capture-evidence/ci-20261102-record.json",
+        "captureRecordSha256": "82c12b4394ea2b5a1a668f6d5c31a64e52febdb8572859b5450cc850bfb82865"
       }
     }
   ]
