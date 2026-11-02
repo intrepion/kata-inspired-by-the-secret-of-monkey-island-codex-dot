@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "gameId": "kata-inspired-by-the-secret-of-monkey-island-codex-dot",
+  "playUrl": "https://intrepion.github.io/kata-inspired-by-the-secret-of-monkey-island-codex-dot/",
+  "screenshots": [
+    {
+      "path": "arcade/screenshots/view-01.jpg",
+      "sha256": "e98e0da583bfbc510839549d147885ccb44d8839ce7208297f413f811ff61932",
+      "alt": "Gameplay capture 1",
+      "provenance": {
+        "kind": "existing_repository_capture",
+        "sourcePath": "docs/qa/tavern.jpg",
+        "deployedBuild": null,
+        "captureDate": null
+      }
+    },
+    {
+      "path": "arcade/screenshots/view-02.jpg",
+      "sha256": "9ca654b0504f407b2171cf37f57304feb34226f7d3a1b4939939e10b2a37b5e1",
+      "alt": "Gameplay capture 2",
+      "provenance": {
+        "kind": "existing_repository_capture",
+        "sourcePath": "docs/qa/market.jpg",
+        "deployedBuild": null,
+        "captureDate": null
+      }
+    }
+  ]
+}
